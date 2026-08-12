@@ -225,5 +225,5 @@ Este projeto é disponibilizado sob a licença **MIT**. Veja o arquivo [LICENSE]
 ---
 
 <div align="center">
-  <sub>Desenvolvido por <b>SOFTCOMP Tecnologia em Sistemas</b></sub>
+  <sub>Desenvolvido por Bielecky para <b>SOFTCOMP Tecnologia em Sistemas</b></sub>
 </div>
