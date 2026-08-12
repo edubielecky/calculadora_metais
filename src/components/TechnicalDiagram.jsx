@@ -24,7 +24,7 @@ const FIELD_DESCRIPTIONS = {
   espessura_aba: { symbol: 'tf', label: 'Espessura da Aba (tf)', desc: 'Cota tf: Espessura das abas superiores/inferiores da viga I/H' }
 };
 
-export default function TechnicalDiagram({ shapeId, activeField, inputs, unitSystem = 'mm' }) {
+export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
   const [viewMode, setViewMode] = useState('3d');
   const [userRotationAngle, setUserRotationAngle] = useState(0);
 
@@ -73,46 +73,74 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs, unitSys
         const widthFocused = isFocused('largura');
 
         return (
-          <g transform={`translate(${130 - extX * 0.3}, ${115 - extY * 0.3}) scale(${camera.scale})`}>
-            {/* 3D Rolled Coil / Strip Perspective */}
+          <g transform={`translate(${110 - extX * 0.2}, ${110 - extY * 0.2}) scale(${camera.scale})`}>
+            {/* Unrolled Strip (Fita desenrolando da bobina ao longo do Comprimento C) */}
             <path
-              d={`M -50,-10 L ${-50 + extX},${-10 + extY} L ${50 + extX},${-10 + extY} 50,-10 Z`}
-              fill="rgba(56, 189, 248, 0.18)"
-              stroke={widthFocused ? '#38bdf8' : '#3b82f6'}
-              strokeWidth={widthFocused ? '3' : '1.5'}
-            />
-            <rect
-              x="-50"
-              y="-10"
-              width="100"
-              height="20"
-              fill="rgba(56, 189, 248, 0.1)"
-              stroke={thickFocused || widthFocused ? '#38bdf8' : '#3b82f6'}
-              strokeWidth={thickFocused || widthFocused ? '3.5' : '2.5'}
-              rx="2"
-            />
-            <polygon
-              points={`50,-10 ${50 + extX},${-10 + extY} ${50 + extX},${10 + extY} 50,10`}
-              fill="rgba(56, 189, 248, 0.05)"
-              stroke={isLengthFocused ? '#38bdf8' : '#1e3a8a'}
+              d={`M -20,25 L ${-20 + extX},${25 + extY} L ${40 + extX},${25 + extY} L 40,25 Z`}
+              fill="rgba(56, 189, 248, 0.15)"
+              stroke={isLengthFocused ? '#38bdf8' : '#3b82f6'}
               strokeWidth={isLengthFocused ? '3' : '1.5'}
             />
+            {/* Strip Front Edge (Espessura e) */}
+            <path
+              d={`M ${-20 + extX},${25 + extY} L ${-20 + extX},${28 + extY} L ${40 + extX},${28 + extY} L ${40 + extX},${25 + extY} Z`}
+              fill="rgba(239, 68, 68, 0.4)"
+              stroke={thickFocused ? '#ef4444' : '#3b82f6'}
+              strokeWidth={thickFocused ? '2.5' : '1'}
+            />
 
-            {/* Cota Z (Comprimento C) */}
-            <line x1="50" y1="-10" x2={50 + extX} y2={-10 + extY} stroke={isLengthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
-            <text x={50 + extX / 2 + 8} y={-10 + extY / 2} fill={isLengthFocused ? '#38bdf8' : '#cbd5e1'} fontSize={isLengthFocused ? '12' : '10'} fontWeight="700">
+            {/* 3D Rolled Coil Cylinder Body (Corpo Cilíndrico da Bobina) */}
+            <path
+              d={`M -30,-40 L 20,-40 A 35,40 0 0,1 20,40 L -30,40 A 35,40 0 0,0 -30,-40 Z`}
+              fill="rgba(56, 189, 248, 0.12)"
+              stroke={widthFocused ? '#38bdf8' : '#1e3a8a'}
+              strokeWidth={widthFocused ? '2.5' : '1.5'}
+            />
+
+            {/* Front Coil Ellipse Face (Face Frontal da Bobina) */}
+            <ellipse
+              cx="-30"
+              cy="0"
+              rx="35"
+              ry="40"
+              fill="rgba(18, 24, 38, 0.9)"
+              stroke={thickFocused || widthFocused ? '#38bdf8' : '#3b82f6'}
+              strokeWidth={thickFocused || widthFocused ? '3' : '2'}
+            />
+
+            {/* Concentric Winding Rings (Espirais de Enrolamento da Fita) */}
+            <ellipse cx="-30" cy="0" rx="27" ry="31" fill="none" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 2" opacity="0.6" />
+            <ellipse cx="-30" cy="0" rx="20" ry="23" fill="none" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 2" opacity="0.6" />
+
+            {/* Inner Core Hole / Mandrel (Furo Central do Carretel) */}
+            <ellipse
+              cx="-30"
+              cy="0"
+              rx="13"
+              ry="15"
+              fill="#0d1322"
+              stroke="#64748b"
+              strokeWidth="2"
+            />
+
+            {/* Rear Coil Ellipse Outline */}
+            <ellipse cx="20" cy="0" rx="35" ry="40" fill="none" stroke="#1e293b" strokeWidth="1.5" strokeDasharray="2 2" />
+
+            {/* Cota Z (Comprimento Linear C da Fita) */}
+            <line x1="40" y1="25" x2={40 + extX} y2={25 + extY} stroke={isLengthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
+            <text x={40 + extX / 2 + 10} y={25 + extY / 2 - 5} fill={isLengthFocused ? '#38bdf8' : '#cbd5e1'} fontSize={isLengthFocused ? '12' : '10'} fontWeight="700">
               C (Comprimento Linear)
             </text>
 
             {/* Cota X (Largura da Fita L) */}
-            <line x1="-50" y1="-18" x2="50" y2="-18" stroke={widthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={widthFocused ? '2.5' : '1.5'} />
-            <text x="0" y="-23" fill={widthFocused ? '#38bdf8' : '#cbd5e1'} fontSize={widthFocused ? '12' : '10'} fontWeight="700" textAnchor="middle">
+            <line x1="-30" y1="-48" x2="20" y2="-48" stroke={widthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={widthFocused ? '2.5' : '1.5'} />
+            <text x="-5" y="-53" fill={widthFocused ? '#38bdf8' : '#cbd5e1'} fontSize={widthFocused ? '12' : '10'} fontWeight="700" textAnchor="middle">
               L (Largura da Fita)
             </text>
 
-            {/* Cota Y (Espessura e) */}
-            <line x1="58" y1="-10" x2="58" y2="10" stroke={thickFocused ? '#ef4444' : '#94a3b8'} strokeWidth={thickFocused ? '2.5' : '1.5'} />
-            <text x="65" y="4" fill={thickFocused ? '#ef4444' : '#cbd5e1'} fontSize={thickFocused ? '12' : '10'} fontWeight="700">
+            {/* Cota Y (Espessura e da Fita) */}
+            <line x1={40 + extX + 8} y1={25 + extY} x2={40 + extX + 8} y2={28 + extY} stroke={thickFocused ? '#ef4444' : '#94a3b8'} strokeWidth={thickFocused ? '2.5' : '1.5'} />
+            <text x={40 + extX + 14} y={28 + extY} fill={thickFocused ? '#ef4444' : '#cbd5e1'} fontSize={thickFocused ? '12' : '10'} fontWeight="700">
               e
             </text>
           </g>
@@ -460,7 +488,7 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs, unitSys
             }}
           >
             <RotateCw size={12} />
-            <span>3D Angle</span>
+            <span>Girar 3D</span>
           </button>
 
           <div style={{
