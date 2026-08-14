@@ -83,8 +83,8 @@ export default function MetalSelector({ selectedMetal, onSelectMetal }) {
               key={metal.id}
               onClick={() => onSelectMetal(metal)}
               style={{
-                background: isSelected ? 'rgba(56, 189, 248, 0.14)' : 'rgba(255, 255, 255, 0.02)',
-                border: isSelected ? '1.5px solid var(--accent-cyan)' : '1px solid var(--border-color)',
+                background: isSelected ? 'rgba(184, 115, 51, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                border: isSelected ? '1.5px solid var(--accent-copper)' : '1px solid var(--border-color)',
                 borderRadius: '12px',
                 padding: '0.85rem',
                 textAlign: 'left',
@@ -115,7 +115,7 @@ export default function MetalSelector({ selectedMetal, onSelectMetal }) {
                 alignItems: 'center',
                 justify: 'space-between',
                 fontSize: '0.82rem',
-                color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                color: isSelected ? 'var(--accent-copper)' : 'var(--text-secondary)',
                 fontWeight: 700
               }}>
                 <span>{metal.density.toFixed(2)} g/cm³</span>
@@ -137,7 +137,7 @@ export default function MetalSelector({ selectedMetal, onSelectMetal }) {
           color: 'var(--text-secondary)',
           borderLeft: `3px solid ${selectedMetal.color || 'var(--accent-cyan)'}`
         }}>
-          <Info size={18} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+          <Info size={18} color="var(--accent-copper)" style={{ flexShrink: 0 }} />
           <span>{selectedMetal.description} — <strong>Densidade ({selectedMetal.id}): {selectedMetal.density} g/cm³</strong></span>
         </div>
       )}

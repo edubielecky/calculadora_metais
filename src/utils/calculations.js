@@ -102,9 +102,10 @@ export function validatePhysicalConstraints(shapeId, inputs) {
 
   if (shapeId === 'perfil_l_cantoneira') {
     const aba = convert(inputs.aba);
+    const aba_b = convert(inputs.aba_b) > 0 ? convert(inputs.aba_b) : aba;
     const espessura = convert(inputs.espessura);
-    if (espessura > 0 && aba > 0 && espessura >= aba) {
-      errors.espessura = 'A espessura deve ser menor que a largura da aba';
+    if (espessura > 0 && aba > 0 && (espessura >= aba || espessura >= aba_b)) {
+      errors.espessura = 'A espessura deve ser menor que a largura de ambas as abas (A e B)';
     }
   }
 
@@ -280,7 +281,12 @@ export function generateCommercialDescription({ shape, metal, inputs, results })
   } else if (shape.id === 'tubo_quadrado') {
     dimStr = `${formatVal(inputs.lado)} x Parede ${formatVal(inputs.parede)} x ${formatVal(inputs.comprimento)}`;
   } else if (shape.id === 'perfil_l_cantoneira') {
-    dimStr = `Aba ${formatVal(inputs.aba)} x e ${formatVal(inputs.espessura)} x C ${formatVal(inputs.comprimento)}`;
+    const hasAbaB = inputs.aba_b && parseDimensionValue(inputs.aba_b) > 0;
+    if (hasAbaB) {
+      dimStr = `A ${formatVal(inputs.aba)} x B ${formatVal(inputs.aba_b)} x e ${formatVal(inputs.espessura)} x C ${formatVal(inputs.comprimento)}`;
+    } else {
+      dimStr = `Aba ${formatVal(inputs.aba)} x e ${formatVal(inputs.espessura)} x C ${formatVal(inputs.comprimento)}`;
+    }
   } else if (shape.id === 'perfil_t') {
     dimStr = `Mesa ${formatVal(inputs.mesa)} x Altura ${formatVal(inputs.altura)} x e ${formatVal(inputs.espessura)} x C ${formatVal(inputs.comprimento)}`;
   } else if (shape.id === 'perfil_u') {

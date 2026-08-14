@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { Sliders, HelpCircle, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { parseDimensionValue } from '../utils/calculations';
 
@@ -15,6 +16,27 @@ export default function CalculatorForm({
   errors = {}
 }) {
   if (!shape) return null;
+
+  // ── Estado local: aba desigual para Perfil L / Cantoneira
+  const [abaDesigual, setAbaDesigual] = useState(false);
+
+  // Reseta quando o shape muda (saímos do Perfil L)
+  useEffect(() => {
+    if (shape.id !== 'perfil_l_cantoneira') {
+      setAbaDesigual(false);
+    } else if (!abaDesigual) {
+      // Garante que aba_b seja limpa ao entrar no shape sem o toggle ativo
+      onInputChange('aba_b', '');
+    }
+  }, [shape.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAbaDesigualToggle = (checked) => {
+    setAbaDesigual(checked);
+    if (!checked) {
+      // Desmarcou: limpa aba_b para que o cálculo use aba simétrica (B = A)
+      onInputChange('aba_b', '');
+    }
+  };
 
   const titleShapeName = shape.name.toUpperCase();
 
@@ -91,13 +113,13 @@ export default function CalculatorForm({
                   style={{
                     borderTopRightRadius: 0,
                     borderBottomRightRadius: 0,
-                    borderColor: hasError ? '#ef4444' : (activeField === field.id ? '#38bdf8' : 'var(--border-color)'),
-                    boxShadow: hasError ? '0 0 0 2px rgba(239, 68, 68, 0.3)' : undefined
+                    borderColor: hasError ? 'var(--accent-red)' : (activeField === field.id ? 'var(--accent-copper)' : 'var(--border-color)'),
+                    boxShadow: hasError ? '0 0 0 2px rgba(192, 57, 43, 0.25)' : undefined
                   }}
                 />
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.05)',
-                  border: `1px solid ${hasError ? '#ef4444' : 'var(--border-color)'}`,
+                  border: `1px solid ${hasError ? 'var(--accent-red)' : 'var(--border-color)'}`,
                   borderLeft: 'none',
                   borderTopRightRadius: '12px',
                   borderBottomRightRadius: '12px',
@@ -118,7 +140,7 @@ export default function CalculatorForm({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.35rem',
-                  color: '#ef4444',
+                  color: 'var(--accent-red)',
                   fontSize: '0.75rem',
                   marginTop: '0.35rem',
                   fontWeight: 600
@@ -130,6 +152,93 @@ export default function CalculatorForm({
             </div>
           );
         })}
+
+        {/* ── Aba Desigual: visível somente para Perfil L / Cantoneira */}
+        {shape.id === 'perfil_l_cantoneira' && (
+          <>
+            {/* Checkbox row — ocupa a largura total */}
+            <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '0.7rem',
+              padding: '0.6rem 0.85rem',
+              background: abaDesigual ? 'rgba(184, 115, 51, 0.08)' : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${abaDesigual ? 'var(--accent-copper)' : 'var(--border-color)'}`,
+              borderRadius: '10px',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
+            }}
+              onClick={() => handleAbaDesigualToggle(!abaDesigual)}
+            >
+              {/* Custom checkbox */}
+              <div style={{
+                width: '18px', height: '18px', borderRadius: '4px', flexShrink: 0,
+                border: `2px solid ${abaDesigual ? 'var(--accent-copper)' : 'var(--border-color)'}`,
+                background: abaDesigual ? 'var(--accent-copper)' : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.15s ease'
+              }}>
+                {abaDesigual && (
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <span style={{
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                color: abaDesigual ? 'var(--accent-copper)' : 'var(--text-secondary)',
+                userSelect: 'none',
+                transition: 'color 0.15s ease'
+              }}>
+                Aba Desigual
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.2rem' }}>
+                {abaDesigual ? '— informe as duas abas separadamente' : '— L simétrico (A = B)'}
+              </span>
+            </div>
+
+            {/* Campo Aba B — só aparece se abaDesigual estiver ativo */}
+            {abaDesigual && (
+              <div style={{ animation: 'fadeIn 0.2s ease' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.83rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    Aba B (mm)
+                  </label>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--accent-copper)', fontWeight: 600 }}>campo B</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    id="input-aba-b"
+                    placeholder="0.00 ou 1/2&quot;"
+                    value={inputs.aba_b !== undefined ? inputs.aba_b : ''}
+                    onChange={(e) => onInputChange('aba_b', e.target.value)}
+                    onFocus={() => setActiveField('aba_b')}
+                    onBlur={(e) => handleBlur('aba_b', e.target.value)}
+                    style={{
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                      borderColor: activeField === 'aba_b' ? 'var(--accent-copper)' : 'var(--border-color)'
+                    }}
+                  />
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid var(--border-color)',
+                    borderLeft: 'none',
+                    borderTopRightRadius: '12px',
+                    borderBottomRightRadius: '12px',
+                    padding: '0.75rem 0.85rem',
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)',
+                    fontWeight: 600,
+                    minWidth: '55px',
+                    textAlign: 'center'
+                  }}>
+                    mm
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Quantidade */}
         <div>

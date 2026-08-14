@@ -18,7 +18,7 @@ export default function Header({
   return (
     <header style={{
       borderBottom: '1px solid var(--border-color)',
-      background: '#121824',
+      background: 'var(--bg-surface)',
       padding: '0.85rem 2rem',
       position: 'sticky',
       top: 0,
@@ -86,7 +86,7 @@ export default function Header({
                 }}
               >
                 {families.map(f => (
-                  <option key={f} value={f} style={{ background: '#121824', color: '#fff' }}>{f}</option>
+                  <option key={f} value={f} style={{ background: 'var(--bg-dark)', color: '#fff' }}>{f}</option>
                 ))}
               </select>
               <ChevronDown size={14} color="var(--text-muted)" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
@@ -116,7 +116,7 @@ export default function Header({
                 }}
               >
                 {familyMetals.map(m => (
-                  <option key={m.id} value={m.id} style={{ background: '#121824', color: '#fff' }}>
+                  <option key={m.id} value={m.id} style={{ background: 'var(--bg-dark)', color: '#fff' }}>
                     {m.name} (ρ = {m.density} g/cm³)
                   </option>
                 ))}

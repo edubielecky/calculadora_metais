@@ -143,8 +143,8 @@ export const GEOMETRIAS_SPEC = {
         { "id": "espessura", "nome": "Espessura (e)", "unidade": "mm", "simbolo": "e", "default": 5 },
         { "id": "comprimento", "nome": "Comprimento (C)", "unidade": "mm", "simbolo": "C", "default": 1000 }
       ],
-      "formula_volume_mm3": "(espessura * ((2 * aba) - espessura)) * comprimento",
-      "descricao_formula": "V = e × (2A - e) × C"
+      "formula_volume_mm3": "(espessura * (aba + (aba_b || aba) - espessura)) * comprimento",
+      "descricao_formula": "V = e × (A + B - e) × C  [B = A se aba simétrica]"
     },
     {
       "id": "perfil_t",
@@ -252,11 +252,16 @@ const shapeCalculators = {
     const C = parseFloat(comprimento) || 0;
     return (2 * e * (A + B - (2 * e))) * C;
   },
-  perfil_l_cantoneira: ({ aba, espessura, comprimento }) => {
+  perfil_l_cantoneira: ({ aba, aba_b, espessura, comprimento }) => {
     const A = parseFloat(aba) || 0;
+    // Se aba_b foi fornecida e é positiva → cantoneira de aba desigual
+    // Caso contrário → aba simétrica (B = A)
+    const B = (parseFloat(aba_b) > 0) ? parseFloat(aba_b) : A;
     const e = parseFloat(espessura) || 0;
     const C = parseFloat(comprimento) || 0;
-    return (e * ((2 * A) - e)) * C;
+    // V = e × (A + B - e) × C
+    // Prova simétrica: B=A → e(A+A-e) = e(2A-e) ✓
+    return (e * (A + B - e)) * C;
   },
   perfil_t: ({ mesa, altura, espessura, comprimento }) => {
     const A = parseFloat(mesa) || 0;

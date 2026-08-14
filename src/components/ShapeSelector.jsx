@@ -6,7 +6,7 @@ import { LayoutGrid } from 'lucide-react';
  * Renderizador de Ícones Vetoriais das Seções Transversais de Geometria
  */
 function GeometryVectorIcon({ shapeId, isSelected }) {
-  const stroke = isSelected ? '#38bdf8' : '#94a3b8';
+  const stroke = isSelected ? '#B87333' : '#5A6070';
 
   switch (shapeId) {
     case 'chapa_bloco_retalho':
@@ -147,7 +147,7 @@ export default function ShapeSelector({ selectedShape, onSelectShape }) {
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
               style={{
-                background: selectedCategory === cat.id ? 'var(--accent-blue)' : 'rgba(255, 255, 255, 0.04)',
+                background: selectedCategory === cat.id ? 'var(--accent-copper)' : 'rgba(255, 255, 255, 0.04)',
                 color: selectedCategory === cat.id ? '#fff' : 'var(--text-muted)',
                 border: 'none',
                 padding: '0.3rem 0.65rem',
@@ -194,8 +194,8 @@ export default function ShapeSelector({ selectedShape, onSelectShape }) {
               key={shape.id}
               onClick={() => onSelectShape(shape)}
               style={{
-                background: isSelected ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                border: isSelected ? '2px solid #38bdf8' : '1px solid var(--border-color)',
+                background: isSelected ? 'rgba(184, 115, 51, 0.10)' : 'rgba(255, 255, 255, 0.02)',
+                border: isSelected ? '2px solid #B87333' : '1px solid var(--border-color)',
                 borderRadius: '12px',
                 padding: '1rem 0.65rem',
                 cursor: 'pointer',
@@ -206,7 +206,7 @@ export default function ShapeSelector({ selectedShape, onSelectShape }) {
                 justify: 'center',
                 gap: '0.65rem',
                 position: 'relative',
-                boxShadow: isSelected ? '0 0 16px rgba(56, 189, 248, 0.25)' : 'none'
+                boxShadow: isSelected ? '0 0 14px rgba(184, 115, 51, 0.20)' : 'none'
               }}
             >
               {isSelected && (
@@ -217,8 +217,8 @@ export default function ShapeSelector({ selectedShape, onSelectShape }) {
                   width: '7px',
                   height: '7px',
                   borderRadius: '50%',
-                  background: '#38bdf8',
-                  boxShadow: '0 0 8px #38bdf8'
+                  background: '#B87333',
+                  boxShadow: '0 0 6px #B87333'
                 }} />
               )}
 

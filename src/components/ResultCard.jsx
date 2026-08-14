@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { formatNumber, generateCommercialDescription } from '../utils/calculations';
-import TechnicalDiagram from './TechnicalDiagram';
 import { Copy, Check } from 'lucide-react';
 
 export default function ResultCard({
@@ -30,9 +29,9 @@ export default function ResultCard({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'sticky', top: '85px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Primary Weight Display Card */}
-      <div className="glass-card" style={{ padding: '1.5rem', background: '#121824' }}>
+      <div className="glass-card" style={{ padding: '1.5rem', background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             PESO UNITÁRIO
@@ -50,21 +49,14 @@ export default function ResultCard({
         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           PESO TOTAL BRUTO
         </span>
-        <div style={{ fontSize: '3.2rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'var(--font-display)', lineHeight: 1.1, marginTop: '0.2rem' }}>
+        <div style={{ fontSize: '3.2rem', fontWeight: 800, color: 'var(--accent-copper)', fontFamily: 'var(--font-display)', lineHeight: 1.1, marginTop: '0.2rem' }}>
           {isValid ? formatNumber(totalWeightKg, 2) : '--.--'} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)', fontWeight: 600 }}>kg</span>
         </div>
       </div>
 
-      {/* Interactive Technical SVG Diagram */}
-      <TechnicalDiagram
-        shapeId={selectedShape.id}
-        activeField={activeField}
-        inputs={inputs}
-      />
-
       {/* Commercial Summary Box */}
       <div style={{
-        background: '#0e1422',
+        background: 'var(--bg-dark)',
         border: '1px solid var(--border-color)',
         borderRadius: '12px',
         padding: '1rem',
@@ -82,12 +74,12 @@ export default function ResultCard({
           onClick={handleCopyDesc}
           title="Copiar Nomenclatura Comercial"
           style={{
-            background: copied ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-            border: `1px solid ${copied ? '#10b981' : 'var(--border-color)'}`,
+            background: copied ? 'rgba(61, 139, 110, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+            border: `1px solid ${copied ? 'var(--accent-emerald)' : 'var(--border-color)'}`,
             borderRadius: '8px',
             padding: '0.5rem',
             cursor: 'pointer',
-            color: copied ? '#10b981' : 'var(--text-primary)',
+            color: copied ? 'var(--accent-emerald)' : 'var(--text-primary)',
             transition: 'all 0.15s ease',
             flexShrink: 0
           }}

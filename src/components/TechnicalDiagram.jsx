@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Target, Box, RotateCw } from 'lucide-react';
 
+
 /**
  * Dicionário de descrições e símbolos de cotas para todas as geometrias (incluindo Bobina e Perfil I/H)
  */
@@ -16,7 +17,8 @@ const FIELD_DESCRIPTIONS = {
   lado_maior: { symbol: 'A', label: 'Lado Maior (A)', desc: 'Cota A: Lado maior da seção retangular 3D' },
   lado_menor: { symbol: 'B', label: 'Lado Menor (B)', desc: 'Cota B: Lado menor da seção retangular 3D' },
   bitola: { symbol: 'S', label: 'Bitola Entre Faces (S)', desc: 'Cota S: Medida entre faces hexagonais paralelas' },
-  aba: { symbol: 'A / B', label: 'Largura da Aba (A / B)', desc: 'Cota A/B: Largura da aba da cantoneira L ou perfil U em 3D' },
+  aba: { symbol: 'A', label: 'Largura da Aba A', desc: 'Cota A: Largura da aba da cantoneira ou perfil em 3D' },
+  aba_b: { symbol: 'B', label: 'Largura da Aba B', desc: 'Cota B: Largura da segunda aba (aba desigual) da cantoneira em 3D' },
   largura_aba: { symbol: 'B', label: 'Largura da Aba (B)', desc: 'Cota B: Largura da aba superior/inferior da viga I/H em 3D' },
   mesa: { symbol: 'A', label: 'Largura da Mesa (A)', desc: 'Cota A: Largura da mesa superior do perfil T em 3D' },
   altura: { symbol: 'H', label: 'Altura / Alma (H)', desc: 'Cota H: Altura total do perfil I/H/T/U em 3D' },
@@ -24,8 +26,9 @@ const FIELD_DESCRIPTIONS = {
   espessura_aba: { symbol: 'tf', label: 'Espessura da Aba (tf)', desc: 'Cota tf: Espessura das abas superiores/inferiores da viga I/H' }
 };
 
+
 export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
-  const [viewMode, setViewMode] = useState('3d');
+  // viewMode removed – always 3D
   const [userRotationAngle, setUserRotationAngle] = useState(0);
 
   const isFocused = (fieldKey) => activeField === fieldKey;
@@ -209,44 +212,57 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
       }
 
       case 'perfil_l_cantoneira': {
-        const abaFocused = isWidthFocused;
+        const abaAFocused = isFocused('aba');
+        const abaBFocused = isFocused('aba_b');
         const thickFocused = isThicknessFocused;
 
         return (
           <g transform={`translate(${110 - extX * 0.3}, ${120 - extY * 0.3}) scale(${camera.scale})`}>
+            {/* Extrusão vertical traseira */}
             <path
               d={`M -40,30 L ${-40 + extX},${30 + extY} L ${-40 + extX},${-50 + extY} L -40,-50 Z`}
-              fill="rgba(56, 189, 248, 0.04)"
-              stroke={isLengthFocused ? '#38bdf8' : '#1e3a8a'}
+              fill="rgba(140, 156, 176, 0.06)"
+              stroke={isLengthFocused ? 'var(--accent-copper)' : '#3C3F48'}
               strokeWidth="1.5"
             />
+            {/* Extrusão horizontal traseira */}
             <path
               d={`M -40,30 L ${-40 + extX},${30 + extY} L ${40 + extX},${30 + extY} L 40,30 Z`}
-              fill="rgba(56, 189, 248, 0.06)"
-              stroke={isLengthFocused ? '#38bdf8' : '#1e3a8a'}
+              fill="rgba(140, 156, 176, 0.08)"
+              stroke={isLengthFocused ? 'var(--accent-copper)' : '#3C3F48'}
               strokeWidth="1.5"
             />
+            {/* Seção frontal do perfil L */}
             <path
               d="M -40,30 L -40,-50 L -22,-50 L -22,12 L 40,12 L 40,30 Z"
-              fill="rgba(56, 189, 248, 0.15)"
-              stroke={abaFocused || thickFocused ? '#38bdf8' : '#3b82f6'}
-              strokeWidth={abaFocused || thickFocused ? '3.5' : '2.5'}
+              fill="rgba(26, 27, 31, 0.9)"
+              stroke={abaAFocused || abaBFocused || thickFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth={abaAFocused || abaBFocused || thickFocused ? '3.5' : '2.5'}
             />
-            <line x1="40" y1="30" x2={40 + extX} y2={30 + extY} stroke={isLengthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
-            <text x={40 + extX / 2 + 10} y={30 + extY / 2} fill={isLengthFocused ? '#38bdf8' : '#cbd5e1'} fontSize={isLengthFocused ? '12' : '10'} fontWeight="700">
+            {/* Cota Z (Comprimento) */}
+            <line x1="40" y1="30" x2={40 + extX} y2={30 + extY} stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
+            <text x={40 + extX / 2 + 10} y={30 + extY / 2} fill={isLengthFocused ? 'var(--accent-copper)' : '#C0C8D4'} fontSize={isLengthFocused ? '12' : '10'} fontWeight="700">
               C (Comprimento)
             </text>
-            <line x1="-40" y1="42" x2="40" y2="42" stroke={abaFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={abaFocused ? '2.5' : '1.5'} />
-            <text x="0" y="55" fill={abaFocused ? '#38bdf8' : '#cbd5e1'} fontSize={abaFocused ? '12' : '10'} fontWeight="700" textAnchor="middle">
-              A (Largura da Aba)
+            {/* Cota Aba A (horizontal) */}
+            <line x1="-40" y1="42" x2="40" y2="42" stroke={abaAFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth={abaAFocused ? '2.5' : '1.5'} />
+            <text x="0" y="55" fill={abaAFocused ? 'var(--accent-copper)' : '#C0C8D4'} fontSize={abaAFocused ? '12' : '10'} fontWeight="700" textAnchor="middle">
+              A (Aba A)
             </text>
-            <line x1="-50" y1="30" x2="-50" y2="12" stroke={thickFocused ? '#ef4444' : '#94a3b8'} strokeWidth={thickFocused ? '2.5' : '1.5'} />
-            <text x="-58" y="24" fill={thickFocused ? '#ef4444' : '#cbd5e1'} fontSize={thickFocused ? '12' : '10'} fontWeight="700" textAnchor="end">
+            {/* Cota Aba B / Altura vertical */}
+            <line x1="-52" y1="-50" x2="-52" y2="30" stroke={abaBFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth={abaBFocused ? '2.5' : '1.2'} strokeDasharray={abaBFocused ? 'none' : '3 2'} />
+            <text x="-58" y="-10" fill={abaBFocused ? 'var(--accent-copper)' : '#C0C8D4'} fontSize={abaBFocused ? '12' : '10'} fontWeight="700" textAnchor="end">
+              B
+            </text>
+            {/* Cota Espessura e */}
+            <line x1="-22" y1="-58" x2="-40" y2="-58" stroke={thickFocused ? 'var(--accent-red)' : 'var(--accent-steel)'} strokeWidth={thickFocused ? '2.5' : '1.5'} />
+            <text x="-31" y="-63" fill={thickFocused ? 'var(--accent-red)' : '#C0C8D4'} fontSize={thickFocused ? '12' : '10'} fontWeight="700" textAnchor="middle">
               e
             </text>
           </g>
         );
       }
+
 
       case 'perfil_t': {
         const mesaFocused = isWidthFocused;
@@ -426,14 +442,141 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
         );
       }
 
+      case 'barra_sextavada': {
+        const bitolaFocused = isFocused('bitola');
+
+        // ── Geometria: hexágono regular "flat-top"
+        // Vértices a cada 60° a partir de 0° (direita)
+        // → v0: direita | v1: inf-dir | v2: inf-esq | v3: esquerda | v4: sup-esq | v5: sup-dir
+        // Flat-top = arestas horizontais no topo e na base, vértice nas laterais
+        const R = 40;
+        const h = R * Math.sqrt(3) / 2; // apótema = metade da "bitola entre faces"
+
+        const v = [
+          [ R,    0  ],  // v0 – direita
+          [ R/2,  h  ],  // v1 – inferior-direita
+          [-R/2,  h  ],  // v2 – inferior-esquerda
+          [-R,    0  ],  // v3 – esquerda
+          [-R/2, -h  ],  // v4 – superior-esquerda
+          [ R/2, -h  ],  // v5 – superior-direita
+        ];
+
+        const ex = extX;
+        const ey = extY;
+
+        // Helper: converte array de [x,y] em string de pontos SVG
+        const p = (arr) => arr.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+
+        // Vértices traseiros (face traseira = face frontal deslocada pelo vetor de extrusão)
+        const vR = v.map(([x, y]) => [x + ex, y + ey]);
+
+        // ── Faces visíveis da perspectiva superior-esquerda (viewer olha de cima-à-esquerda)
+        // Face superior (topo):         v4 → v5 → vR5 → vR4
+        // Face superior-direita:        v5 → v0 → vR0 → vR5
+        // Face inferior-direita:        v0 → v1 → vR1 → vR0
+
+        const topFace   = p([v[4], v[5], vR[5], vR[4]]);
+        const urFace    = p([v[5], v[0], vR[0], vR[5]]);
+        const lrFace    = p([v[0], v[1], vR[1], vR[0]]);
+        const frontFace = p(v);
+        const rearFace  = p(vR);
+
+        return (
+          <g transform={`translate(${115 - ex * 0.35}, ${110 - ey * 0.45}) scale(${camera.scale})`}>
+            {/* Face traseira – tracejada */}
+            <polygon points={rearFace} fill="none" stroke="#3C3F48" strokeWidth="1" strokeDasharray="3 2" />
+
+            {/* Face inferior-direita – menos iluminada */}
+            <polygon
+              points={lrFace}
+              fill="rgba(140, 156, 176, 0.10)"
+              stroke={isLengthFocused ? 'var(--accent-copper)' : '#4A5160'}
+              strokeWidth="1.3"
+            />
+
+            {/* Face lateral superior-direita – meia iluminação */}
+            <polygon
+              points={urFace}
+              fill="rgba(192, 200, 212, 0.22)"
+              stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth="1.5"
+            />
+
+            {/* Face superior (topo) – mais iluminada */}
+            <polygon
+              points={topFace}
+              fill="rgba(215, 222, 232, 0.32)"
+              stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth="1.5"
+            />
+
+            {/* Arestas laterais visíveis do prisma (v4, v5, v0, v1 → traseiro) */}
+            {[4, 5, 0, 1].map(i => (
+              <line key={i}
+                x1={v[i][0]} y1={v[i][1]}
+                x2={vR[i][0]} y2={vR[i][1]}
+                stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+                strokeWidth="1.4"
+              />
+            ))}
+
+            {/* Face frontal – escura como na referência */}
+            <polygon
+              points={frontFace}
+              fill="rgba(17, 18, 20, 0.96)"
+              stroke={bitolaFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth={bitolaFocused ? '3' : '2.5'}
+            />
+
+            {/* ── Cota C: Comprimento (aresta do vértice direito até o fundo) */}
+            <line
+              x1={v[0][0]} y1={v[0][1]}
+              x2={vR[0][0]} y2={vR[0][1]}
+              stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth={isLengthFocused ? '2.5' : '1.5'}
+            />
+            <text
+              x={v[0][0] + ex / 2 + 12} y={v[0][1] + ey / 2}
+              fill={isLengthFocused ? 'var(--accent-copper)' : '#C0C8D4'}
+              fontSize={isLengthFocused ? '12' : '10'} fontWeight="700"
+            >
+              C (Comprimento)
+            </text>
+
+            {/* ── Cota S: Bitola entre faces paralelas (vertical, topo→base da face frontal) */}
+            <line
+              x1={-R / 2 - 14} y1={-h}
+              x2={-R / 2 - 14} y2={h}
+              stroke={bitolaFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'}
+              strokeWidth={bitolaFocused ? '2.5' : '1.2'}
+              strokeDasharray={bitolaFocused ? 'none' : '4 2'}
+            />
+            {/* Marcas de cota */}
+            <line x1={-R / 2 - 18} y1={-h} x2={-R / 2 - 10} y2={-h}
+              stroke={bitolaFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth="1.2" />
+            <line x1={-R / 2 - 18} y1={h} x2={-R / 2 - 10} y2={h}
+              stroke={bitolaFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth="1.2" />
+            <text
+              x={-R / 2 - 20} y={3}
+              fill={bitolaFocused ? 'var(--accent-copper)' : '#C0C8D4'}
+              fontSize={bitolaFocused ? '12' : '10'} fontWeight="700" textAnchor="end"
+            >
+              S (Bitola)
+            </text>
+          </g>
+        );
+      }
+
+
+
       default: {
         return (
           <g transform={`translate(${130 - extX * 0.3}, ${110 - extY * 0.3}) scale(${camera.scale})`}>
-            <polygon points={`-50,-30 ${-50 + extX},${-30 + extY} ${50 + extX},${-30 + extY} 50,-30`} fill="rgba(56, 189, 248, 0.15)" stroke="#3b82f6" strokeWidth="2" />
-            <rect x="-50" y="-30" width="100" height="60" fill="rgba(18, 24, 38, 0.85)" stroke="#38bdf8" strokeWidth="2.5" />
-            <polygon points={`50,-30 ${50 + extX},${-30 + extY} ${50 + extX},${30 + extY} 50,30`} fill="rgba(56, 189, 248, 0.08)" stroke={isLengthFocused ? '#38bdf8' : '#1e3a8a'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
-            <line x1="50" y1="-30" x2={50 + extX} y2={-30 + extY} stroke={isLengthFocused ? '#38bdf8' : '#94a3b8'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
-            <text x={50 + extX / 2 + 8} y={-30 + extY / 2} fill={isLengthFocused ? '#38bdf8' : '#cbd5e1'} fontSize="11" fontWeight="700">
+            <polygon points={`-50,-30 ${-50 + extX},${-30 + extY} ${50 + extX},${-30 + extY} 50,-30`} fill="rgba(140, 156, 176, 0.1)" stroke="var(--accent-iron)" strokeWidth="2" />
+            <rect x="-50" y="-30" width="100" height="60" fill="rgba(26, 27, 31, 0.85)" stroke="var(--accent-steel)" strokeWidth="2.5" />
+            <polygon points={`50,-30 ${50 + extX},${-30 + extY} ${50 + extX},${30 + extY} 50,30`} fill="rgba(140, 156, 176, 0.05)" stroke={isLengthFocused ? 'var(--accent-copper)' : '#3C3F48'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
+            <line x1="50" y1="-30" x2={50 + extX} y2={-30 + extY} stroke={isLengthFocused ? 'var(--accent-copper)' : 'var(--accent-steel)'} strokeWidth={isLengthFocused ? '3' : '1.5'} />
+            <text x={50 + extX / 2 + 8} y={-30 + extY / 2} fill={isLengthFocused ? 'var(--accent-copper)' : '#C0C8D4'} fontSize="11" fontWeight="700">
               C (Comprimento)
             </text>
           </g>
@@ -469,74 +612,31 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
           </h4>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button
-            type="button"
-            onClick={() => setUserRotationAngle(prev => (prev + 30) % 360)}
-            title="Rotacionar Modelo 3D"
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-secondary)',
-              borderRadius: '6px',
-              padding: '0.2rem 0.5rem',
-              fontSize: '0.72rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            <RotateCw size={12} />
-            <span>Girar 3D</span>
-          </button>
-
-          <div style={{
-            display: 'flex',
-            background: 'rgba(0, 0, 0, 0.4)',
+        <button
+          type="button"
+          onClick={() => setUserRotationAngle(prev => (prev + 30) % 360)}
+          title="Rotacionar Modelo 3D"
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid var(--border-color)',
+            color: 'var(--text-secondary)',
             borderRadius: '6px',
-            padding: '2px'
-          }}>
-            <button
-              type="button"
-              onClick={() => setViewMode('3d')}
-              style={{
-                background: viewMode === '3d' ? 'var(--accent-blue)' : 'transparent',
-                color: viewMode === '3d' ? '#fff' : 'var(--text-muted)',
-                border: 'none',
-                padding: '0.15rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              3D
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('2d')}
-              style={{
-                background: viewMode === '2d' ? 'var(--accent-blue)' : 'transparent',
-                color: viewMode === '2d' ? '#fff' : 'var(--text-muted)',
-                border: 'none',
-                padding: '0.15rem 0.5rem',
-                borderRadius: '4px',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
-            >
-              2D
-            </button>
-          </div>
-        </div>
+            padding: '0.2rem 0.5rem',
+            fontSize: '0.72rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.3rem'
+          }}
+        >
+          <RotateCw size={12} />
+          <span>Girar 3D</span>
+        </button>
       </div>
 
       <div style={{
-        background: activeInfo ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-        border: `1px solid ${activeInfo ? '#38bdf8' : 'var(--border-color)'}`,
+        background: activeInfo ? 'rgba(184, 115, 51, 0.10)' : 'rgba(255, 255, 255, 0.02)',
+        border: `1px solid ${activeInfo ? 'var(--accent-copper)' : 'var(--border-color)'}`,
         borderRadius: '8px',
         padding: '0.5rem 0.75rem',
         marginBottom: '0.85rem',
@@ -545,8 +645,8 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
         gap: '0.6rem',
         transition: 'all 0.2s ease'
       }}>
-        <Target size={16} color={activeInfo ? '#38bdf8' : 'var(--text-muted)'} style={{ flexShrink: 0 }} />
-        <span style={{ fontSize: '0.82rem', color: activeInfo ? '#fff' : 'var(--text-muted)', fontWeight: activeInfo ? 700 : 400 }}>
+        <Target size={16} color={activeInfo ? 'var(--accent-copper)' : 'var(--text-muted)'} style={{ flexShrink: 0 }} />
+        <span style={{ fontSize: '0.82rem', color: activeInfo ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: activeInfo ? 700 : 400 }}>
           {activeInfo ? activeInfo.desc : 'Selecione ou edite um campo para ver a descrição e perspectiva 3D da cota'}
         </span>
       </div>
@@ -554,7 +654,7 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
       <div style={{
         width: '100%',
         height: '220px',
-        background: '#0d1322',
+        background: 'var(--bg-dark)',
         borderRadius: '12px',
         border: '1px solid var(--border-color)',
         position: 'relative',
@@ -572,7 +672,7 @@ export default function TechnicalDiagram({ shapeId, activeField, inputs }) {
 
           <rect width="100%" height="100%" fill="url(#blueprint-grid)" />
 
-          {viewMode === '3d' ? render3DModelSvg() : render2DSvg()}
+          {render3DModelSvg()}
         </svg>
       </div>
     </div>

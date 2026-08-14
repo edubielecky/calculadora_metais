@@ -3,10 +3,12 @@ import Header from './components/Header';
 import ShapeSelector from './components/ShapeSelector';
 import CalculatorForm from './components/CalculatorForm';
 import ResultCard from './components/ResultCard';
+import TechnicalDiagram from './components/TechnicalDiagram';
 import FooterERP from './components/FooterERP';
 import { METALS } from './data/metals';
 import { SHAPES } from './data/shapes';
 import { calculateMetalWeight } from './utils/calculations';
+
 
 export default function App() {
   const [selectedFamily, setSelectedFamily] = useState('Aço Inox');
@@ -84,7 +86,7 @@ export default function App() {
   }, [results]);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#0b0f19' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark)' }}>
       <Header
         selectedFamily={selectedFamily}
         onSelectFamily={setSelectedFamily}
@@ -98,18 +100,38 @@ export default function App() {
         width: '100%',
         margin: '0 auto',
         padding: '1.75rem 1.5rem',
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 380px',
-        gap: '1.75rem',
-        alignItems: 'start'
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.75rem'
       }}>
-        {/* Left Column: Geometry Grid & Dynamic Inputs */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* Row 1: Geometry selector | Technical diagram */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 380px',
+          gap: '1.75rem',
+          alignItems: 'start'
+        }}>
           <ShapeSelector
             selectedShape={selectedShape}
             onSelectShape={handleSelectShape}
           />
 
+          <div style={{ position: 'sticky', top: '72px' }}>
+            <TechnicalDiagram
+              shapeId={selectedShape.id}
+              activeField={activeField}
+              inputs={inputs}
+            />
+          </div>
+        </div>
+
+        {/* Row 2: Dimension inputs | Weight results */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 380px',
+          gap: '1.75rem',
+          alignItems: 'start'
+        }}>
           <CalculatorForm
             shape={selectedShape}
             inputs={inputs}
@@ -122,19 +144,19 @@ export default function App() {
             setActiveField={setActiveField}
             errors={results.errors}
           />
-        </div>
 
-        {/* Right Column: High-Impact Results Display & Technical Diagram */}
-        <div>
-          <ResultCard
-            results={results}
-            selectedMetal={selectedMetal}
-            selectedShape={selectedShape}
-            inputs={inputs}
-            activeField={activeField}
-          />
+          <div style={{ position: 'sticky', top: '72px' }}>
+            <ResultCard
+              results={results}
+              selectedMetal={selectedMetal}
+              selectedShape={selectedShape}
+              inputs={inputs}
+              activeField={activeField}
+            />
+          </div>
         </div>
       </main>
+
 
       <FooterERP
         onCancel={handleCancel}
