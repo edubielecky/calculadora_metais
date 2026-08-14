@@ -4,7 +4,7 @@
 
   # ⚙️ Calculadora de Peso Teórico de Metais & Polímeros
 
-  **Módulo Industrial de Engenharia, Orçamentos e Vendas para ERP**
+  **Módulo Industrial de Engenharia para ERP**
 
   [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
   [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -13,7 +13,7 @@
   [![Status](https://img.shields.io/badge/Status-Produção-brightgreen?style=for-the-badge)]()
 
   <p align="center">
-    Ferramenta de alta velocidade operacional desenhada para equipes de vendas, engenharia e produção orçarem dezenas de itens por dia com precisão absoluta e visualização 3D em tempo real.
+    Ferramenta de alta velocidade operacional desenhada por Eduardo Bielecky para a equipe de suporte da Softcomp Sistemas.
   </p>
 
 </div>
